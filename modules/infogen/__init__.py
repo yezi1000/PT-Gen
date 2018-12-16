@@ -11,7 +11,7 @@ from .gen import Gen
 
 getinfo_blueprint = Blueprint('infogen', __name__, url_prefix="/movieinfo")
 
-docs_url = "https://github.com/Rhilip/PT-help/blob/master/modules/infogen/README.md"
+docs_url = "https://github.com/BFDZ/PT-Gen/blob/master/modules/infogen/README.md"
 
 
 def get_key(key):
