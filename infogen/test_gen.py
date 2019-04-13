@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 # Copyright (c) 2017-2020 Rhilip <rhilipruan@gmail.com>
 
+import json
+
 from gen import Gen
 
 if __name__ == '__main__':
@@ -44,13 +46,24 @@ if __name__ == '__main__':
         "http://jdaklvhgfad.com/adfad",  # No support link
     ]
 
-    test_link_list = [
+    dict_link_list = [
+        # Douban
+        {'site': 'douban', 'sid': 3541415},  # Input dict object
+        {'site': 'douban', 'sid': 'tt0083662'},  # IMDb though Douban
+        # IMDb
+        {'site': 'imdb', 'sid': 83662},
+        {'site': 'imdb', 'sid': 'tt0083662'},
+        {'site': 'imdb', 'sid': 'tt0111161'}
+    ]
 
+    test_link_list = [
+        {'site': 'imdb', 'sid': 'tt0111161'}
     ]
     # test_link_list.extend(douban_link_list)
     # test_link_list.extend(imdb_link_list)
     # test_link_list.extend(bgm_link_list)
     # test_link_list.extend(steam_link_list)
+    # test_link_list.extend(dict_link_list)
     # test_link_list.extend(other_link_list)
 
     for link in test_link_list:
@@ -58,6 +71,7 @@ if __name__ == '__main__':
         gen = Gen(link).gen(_debug=True)
         if gen["success"]:
             print("Format text:\n", gen["format"])
+            # print(json.dumps(gen, ensure_ascii=False, sort_keys=True))
         else:
             print("Error : {}".format(gen["error"]))
         print("--------------------")

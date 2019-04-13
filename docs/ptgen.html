@@ -98,34 +98,33 @@
 
 <div class="container-fluid main">
     <div class="row">
-        <!--<div class="col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3">
-            <p class="bg-info">近期，后端服务器暂无法与豆瓣服务器联通，正在解决。期间建议使用脚本 <a href="https://greasyfork.org/zh-CN/scripts/329484">豆瓣资源下载大师</a> 作为替代。</p>
-        </div>-->
         <div class="col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3">
-            <div class="form-inline">
-                <div class="form-group">
-                    <label class="sr-only" for="input_value">Input value</label>
-                    <input type="text" class="form-control" placeholder="名称或豆瓣、IMDb、Bangumi、Steam等资源链接"
-                           id="input_value"/>
+            <div>
+                <div class="form-inline">
+                    <div class="form-group">
+                        <label class="sr-only" for="input_value">Input value</label>
+                        <input type="text" class="form-control" placeholder="名称或豆瓣、IMDb、Bangumi、Steam等资源链接"
+                               id="input_value"/>
+                    </div>
+                    <button class="btn btn-success" id="query_btn">查询</button>
+                    <div class="checkbox" id="force_douban_div" style="display: none;">
+                        <label for="force_douban" class="checkbox"></label>
+                        <input type="checkbox" class="form-control" id="force_douban" checked="checked"/> 通过豆瓣查询
+                    </div>
                 </div>
-                <button class="btn btn-success" id="query_btn">查询</button>
             </div>
-        </div>
-        <div class="col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3">
             <hr>
-        </div>
-        <div id="gen_help" class="col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3" style="display: none">
-
-        </div>
-        <div id="gen_out" class="col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3">
-            <div class="zero-clipboard">
-                <button class="btn btn-clipboard" data-clipboard-target="#movie_info">复制</button>
+            <div id="gen_help" style="display: none"></div>
+            <div id="gen_out">
+                <div class="zero-clipboard">
+                    <button class="btn btn-clipboard" data-clipboard-target="#movie_info">复制</button>
+                </div>
+                <textarea class="form-control" rows=22 id="movie_info"></textarea>
             </div>
-            <textarea class="form-control" rows=22 id="movie_info"></textarea>
         </div>
     </div>
-
 </div>
+
 
 <!-- Bootstrap core JavaScript
 ================================================== -->
@@ -134,12 +133,10 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/clipboard@2.0.0/dist/clipboard.min.js" integrity="sha256-meF2HJJ2Tcruwz3z4XcxYDRMxKprjdruBHc3InmixCQ=" crossorigin="anonymous"></script>
 
-<script>   // 页面信息填充
-// TODO Version and Version Log
-// TODO Sample
-</script>
-
 <script>   // 脚本查询相关
+
+const API_POINT = "http://127.0.0.1:5000/infogen";   //此处请修改
+
 function jsonp(url, arg, fn) {
     let srpt = document.createElement('script');
     let funName = 'fun_' + Math.random().toString().substr(3);
@@ -172,6 +169,14 @@ $(function () {
         query_btn.html("查询");
     };
 
+   input_btn.on('input change',function () {
+       if (input_btn.val().match(/imdb/)) {
+           $('#force_douban_div').show();
+       } else {
+           $('#force_douban_div').hide();
+       }
+    });
+
     query_btn.click(function () {
         gen_help.hide();
         gen_out.show();
@@ -180,12 +185,22 @@ $(function () {
             alert("空字符，请检查输入");
         } else if (/^http/.test(input_value)) {
             query_btn.disable();
-            $.getJSON("https://api.rhilip.info/tool/movieinfo/gen", {
+
+            let param = {
                 url: input_value
-            }).success(function (data) {
-                out_textarea.val(data["success"] ? data["format"] : data["error"]);
-            }).error(function () {
-                alert("Error occured!");
+            };
+            if (input_value.match(/imdb/) && $('#force_douban').prop('checked')) {
+                let sid = input_value.match(/tt\d+/)[0];
+                param = {
+                    site: 'douban',
+                    sid: sid
+                }
+            }
+
+            $.getJSON(API_POINT, param).success(function (data) {
+                out_textarea.val(data["success"] === false ? data["error"] : data["format"]);
+            }).fail(function (jqXHR) {
+                alert(jqXHR.status === 429 ? 'Met Rate Limit, Retry later~' : "Error occured!");
             }).complete(function () {
                 query_btn.enable();
             });
