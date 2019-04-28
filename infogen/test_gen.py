@@ -2,8 +2,6 @@
 # -*- coding: utf-8 -*-
 # Copyright (c) 2017-2020 Rhilip <rhilipruan@gmail.com>
 
-import json
-
 from gen import Gen
 
 if __name__ == '__main__':
@@ -71,7 +69,8 @@ if __name__ == '__main__':
         gen = Gen(link).gen(_debug=True)
         if gen["success"]:
             print("Format text:\n", gen["format"])
-            # print(json.dumps(gen, ensure_ascii=False, sort_keys=True))
+            import json
+            print(json.dumps(gen,ensure_ascii=False,sort_keys=True))
         else:
             print("Error : {}".format(gen["error"]))
         print("--------------------")
