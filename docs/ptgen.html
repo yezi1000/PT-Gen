@@ -15,54 +15,17 @@
 
     <!-- Custom styles for this template -->
     <style type="text/css">
-        /* Move down content because we have a fixed navbar that is 50px tall */
-        body {
-            padding-top: 50px;
-        }
-
-        /*
-         * Top navigation
-         * Hide default border to remove 1px line.
-         */
-        .navbar-fixed-top {
-            border: 0;
-        }
-
-        /* Main content */
-        .main {
-            padding: 20px;
-            margin-top: 0;
-        }
-
-        @media (min-width: 768px) {
-            .main {
-                padding-right: 40px;
-                padding-left: 40px;
-            }
-        }
-
-        #input_value {
-            width: 400px;
-        }
-
-        .zero-clipboard {
-            position: relative;
-        }
-
-        .btn-clipboard {
-            position: absolute;
-            top: 8px;
-            right: 21px;
-            z-index: 10;
-            display: block;
-            padding: 5px 8px;
-            font-size: 12px;
-            color: #767676;
-            cursor: pointer;
-            background-color: #fff;
-            border: 1px solid #e1e1e8;
-            border-radius: 0 4px 0 4px;
-        }
+body{padding-top:50px}
+.navbar-fixed-top{border:0}
+.main{padding:20px;margin-top:0}
+@media (min-width:768px){.main{padding-right:40px;padding-left:40px}
+}#input_value{width:400px}
+.zero-clipboard{position:relative}
+.btn-clipboard{position:absolute;top:8px;right:21px;z-index:10;display:block;padding:5px 8px;font-size:12px;color:#767676;cursor:pointer;background-color:#fff;border:1px solid #e1e1e8;border-radius:0 4px 0 4px}
+ul.timeline{list-style-type:none;position:relative}
+ul.timeline:before{content:' ';background:#d4d9df;display:inline-block;position:absolute;left:29px;width:2px;height:100%;z-index:400}
+ul.timeline > li{margin:20px 0;padding-left:20px}
+ul.timeline > li:before{content:' ';background:white;display:inline-block;position:absolute;border-radius:50%;border:3px solid #22c0e8;left:20px;width:20px;height:20px;z-index:400}
     </style>
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
@@ -121,10 +84,54 @@
                 </div>
                 <textarea class="form-control" rows=22 id="movie_info"></textarea>
             </div>
+            <hr>
+            <div id="gen_history">
+                <h4>更新历史</h4>
+                <ul class="timeline">
+                    <li>
+                        <a href="#" class="float-right">2019-04-10</a>
+                        <p>1. 增加数据库缓存以及后台自动更新过期信息<br>
+                            2. 上线IMDb格式，如果输入IMDb链接但要输出原格式，请勾选 <kbd>通过豆瓣查询</kbd><br>
+                            3. 增加API请求频率限制，以<code>X-RATELIMIT-*</code>响应头展示。<br>
+                            4. 感谢 <a href="https://www.ourbits.club" target="_blank">OurBits</a> 提供技术以及服务器支持
+                        </p>
+                    </li>
+                    <li>
+                        <a href="#" class="float-right">2019-02-23</a>
+                        <p>修改CDN为jsDelivr</p>
+                    </li>
+                    <li>
+                        <a href="#" class="float-right">2018-6-22</a>
+                        <p>增加前端豆瓣搜索（通过豆瓣API）支持</p>
+                    </li>
+                    <li>
+                        <a href="#" class="float-right">2018-04-17</a>
+                        <p>增加Steam信息生成</p>
+                    </li>
+                    <li>
+                        <a href="#" class="float-right">2018-03-17</a>
+                        <p>上线前端页面</p>
+                    </li>
+                    <li>
+                        <a href="#" class="float-right">2017-10-14</a>
+                        <p>API初版上线，初版支持Douban以及Bangumi简介生成</p>
+                    </li>
+                </ul>
+            </div>
+            <hr>
+            <div id="gen_replace">
+                <h4>相关替代</h4>
+                此处列出可以替代本平台的用户脚本，以便在 <code>Pt-Gen</code> 失效或返回数据陈旧时使用
+                <ul style="margin-top: 10px">
+                    <li>豆瓣： <a href="https://greasyfork.org/en/scripts/38878" target="_blank">电影信息查询脚本</a> 或
+                        <a href="https://greasyfork.org/scripts/329484" target="_blank">豆瓣资源下载大师</a></li>
+                    <li>Bangumi： Bangumi Info Export <a href="https://git.io/fjm3l" target="_blank">脚本</a>，
+                        <a href="https://bgm.tv/dev/app/103" target="_blank">应用平台</a></li>
+                </ul>
+            </div>
         </div>
     </div>
 </div>
-
 
 <!-- Bootstrap core JavaScript
 ================================================== -->
@@ -133,10 +140,12 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/clipboard@2.0.0/dist/clipboard.min.js" integrity="sha256-meF2HJJ2Tcruwz3z4XcxYDRMxKprjdruBHc3InmixCQ=" crossorigin="anonymous"></script>
 
+<script>   // 页面信息填充
+// TODO Version and Version Log
+// TODO Sample
+</script>
+
 <script>   // 脚本查询相关
-
-const API_POINT = "http://127.0.0.1:5000/infogen";   //此处请修改
-
 function jsonp(url, arg, fn) {
     let srpt = document.createElement('script');
     let funName = 'fun_' + Math.random().toString().substr(3);
@@ -197,7 +206,7 @@ $(function () {
                 }
             }
 
-            $.getJSON(API_POINT, param).success(function (data) {
+            $.getJSON("https://api.rhilip.info/tool/movieinfo/gen", param).success(function (data) {
                 out_textarea.val(data["success"] === false ? data["error"] : data["format"]);
             }).fail(function (jqXHR) {
                 alert(jqXHR.status === 429 ? 'Met Rate Limit, Retry later~' : "Error occured!");
