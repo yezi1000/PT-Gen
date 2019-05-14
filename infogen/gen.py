@@ -8,7 +8,7 @@ import requests
 from bs4 import BeautifulSoup
 from html2bbcode.parser import HTML2BBCode
 
-__version__ = "0.4.2"
+__version__ = "0.4.3"
 __author__ = "Rhilip"
 
 douban_format = [
@@ -158,7 +158,7 @@ class Gen(object):
         # 处理source为douban，但是sid是tt开头的imdb信息 （这种情况只有使用 {'site':'douban','sid':'tt1234567'} 才可能存在）
         if isinstance(self.sid, str) and self.sid.startswith('tt'):
             # 根据tt号先在豆瓣搜索，如果有则直接使用豆瓣解析结果
-            douban_imdb_api = get_page("https://api.douban.com/v2/movie/imdb/{}".format(self.sid), json_=True)
+            douban_imdb_api = get_page("https://api.douban.com/v2/movie/imdb/{}?apikey=0dad551ec0f84ed02907ff5c42e8ec70".format(self.sid), json_=True)
             if douban_imdb_api.get("alt"):
                 self.pat(douban_imdb_api["alt"])
             else:  # 该imdb号在豆瓣上不存在
@@ -167,7 +167,7 @@ class Gen(object):
 
         douban_link = "https://movie.douban.com/subject/{}/".format(self.sid)
         douban_page = get_page(douban_link, bs_=True)
-        douban_api_json = get_page('https://api.douban.com/v2/movie/{}'.format(self.sid), json_=True)
+        douban_api_json = get_page('https://api.douban.com/v2/movie/{}?apikey=0dad551ec0f84ed02907ff5c42e8ec70'.format(self.sid), json_=True)
 
         if "msg" in douban_api_json:
             self.ret["error"] = douban_api_json["msg"]
