@@ -8,7 +8,7 @@ import requests
 from bs4 import BeautifulSoup
 from html2bbcode.parser import HTML2BBCode
 
-__version__ = "0.4.3"
+__version__ = "0.4.4"
 __author__ = "Rhilip"
 
 douban_format = [
