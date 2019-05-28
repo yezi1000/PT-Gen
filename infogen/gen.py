@@ -4,11 +4,12 @@
 
 import re
 import json
+import random
 import requests
 from bs4 import BeautifulSoup
 from html2bbcode.parser import HTML2BBCode
 
-__version__ = "0.4.4"
+__version__ = "0.4.5"
 __author__ = "Rhilip"
 
 douban_format = [
@@ -74,11 +75,23 @@ support_list = [
 
 support_site_list = list(map(lambda x: x[0], support_list))
 
+douban_apikey_list = [
+    "02646d3fb69a52ff072d47bf23cef8fd",
+    "0b2bdeda43b5688921839c8ecb20399b",
+    "0dad551ec0f84ed02907ff5c42e8ec70",
+    "0df993c66c0c636e29ecbb5344252a4a",
+    "07c78782db00a121175696889101e363"
+]
+
 headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
                   'Chrome/61.0.3163.100 Safari/537.36 ',
     "Accept-Language": "en,zh-CN;q=0.9,zh;q=0.8"
 }
+
+
+def get_db_apikey() -> str:
+    return random.choice(douban_apikey_list)
 
 
 def get_page(url: str, json_=False, jsonp_=False, bs_=False, text_=False, **kwargs):
@@ -158,7 +171,11 @@ class Gen(object):
         # 处理source为douban，但是sid是tt开头的imdb信息 （这种情况只有使用 {'site':'douban','sid':'tt1234567'} 才可能存在）
         if isinstance(self.sid, str) and self.sid.startswith('tt'):
             # 根据tt号先在豆瓣搜索，如果有则直接使用豆瓣解析结果
-            douban_imdb_api = get_page("https://api.douban.com/v2/movie/imdb/{}?apikey=0dad551ec0f84ed02907ff5c42e8ec70".format(self.sid), json_=True)
+            douban_imdb_api = get_page(
+                "https://api.douban.com/v2/movie/imdb/{}".format(self.sid),
+                params={'apikey': get_db_apikey()},
+                json_=True
+            )
             if douban_imdb_api.get("alt"):
                 self.pat(douban_imdb_api["alt"])
             else:  # 该imdb号在豆瓣上不存在
@@ -167,7 +184,11 @@ class Gen(object):
 
         douban_link = "https://movie.douban.com/subject/{}/".format(self.sid)
         douban_page = get_page(douban_link, bs_=True)
-        douban_api_json = get_page('https://api.douban.com/v2/movie/{}?apikey=0dad551ec0f84ed02907ff5c42e8ec70'.format(self.sid), json_=True)
+        douban_api_json = get_page(
+            'https://api.douban.com/v2/movie/{}'.format(self.sid),
+            params={'apikey': get_db_apikey()},
+            json_=True
+        )
 
         if "msg" in douban_api_json:
             self.ret["error"] = douban_api_json["msg"]
@@ -364,7 +385,7 @@ class Gen(object):
             details_dict = {}
             details_list_raw = list(filter(lambda x: x is not None, map(get_title, title_anothers)))
             for d in details_list_raw:
-                for k,v in d.items():
+                for k, v in d.items():
                     details_dict[k] = v
 
             data['details'] = details_dict
