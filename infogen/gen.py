@@ -9,7 +9,7 @@ import requests
 from bs4 import BeautifulSoup
 from html2bbcode.parser import HTML2BBCode
 
-__version__ = "0.4.5"
+__version__ = "0.4.6"
 __author__ = "Rhilip"
 
 douban_format = [
@@ -273,11 +273,15 @@ class Gen(object):
             data["awards"] = awards
 
             # 豆瓣评分，简介，海报，导演，编剧，演员，标签
+            
             data["douban_rating_average"] = douban_average_rating = douban_api_json["rating"]["average"] or 0
             data["douban_votes"] = douban_votes = douban_api_json["rating"]["numRaters"] or 0
             data["douban_rating"] = "{}/10 from {} users".format(douban_average_rating, douban_votes)
             data["introduction"] = re.sub("^None$", "暂无相关剧情介绍", douban_api_json["summary"])
-            data["poster"] = poster = re.sub("s(_ratio_poster|pic)", r"l\1", douban_api_json["image"])
+            
+            poster = re.sub("s(_ratio_poster|pic)", r"l\1", douban_api_json["image"])
+            poster = re.sub("img3(.doubanio.com)", r"img1\1", poster)
+            data["poster"] = poster 
             self.img_list.append(poster)
 
             data["director"] = douban_api_json["attrs"]["director"] if "director" in douban_api_json["attrs"] else []
