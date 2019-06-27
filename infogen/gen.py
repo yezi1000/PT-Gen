@@ -9,7 +9,7 @@ import requests
 from bs4 import BeautifulSoup
 from html2bbcode.parser import HTML2BBCode
 
-__version__ = "0.4.6"
+__version__ = "0.4.7"
 __author__ = "Rhilip"
 
 douban_format = [
@@ -65,12 +65,33 @@ steam_format = [
     ('screenshot', "【游戏截图】\n\n{}\n\n"),
 ]
 
+indienova_format = [
+    ("cover", "[img]{}[/img]\n\n"),
+    ('baseinfo', "【基本信息】\n\n{}\n"),
+    ('descr', "【游戏简介】\n\n{}\n\n"),
+    ('screenshot', "【游戏截图】\n\n{}\n\n"),
+    ('level',"【游戏评级】\n\n{}\n\n"),
+]
+
+epic_format=[
+    ("logo", "[img]{}[/img]\n\n"),
+    ('baseinfo', "【基本信息】\n\n{}\n"),
+    ('language',"【支持语言】\n\n{}\n\n"),
+    ('desc', "【游戏简介】\n\n{}\n\n"),
+    ('min_req', "【最低配置】\n\n{}\n\n"),
+    ('max_req', "【推荐配置】\n\n{}\n\n"),
+    ('screenshot', "【游戏截图】\n\n{}\n\n"),
+    ("level", "【游戏评级】\n\n[img]{}[/img]\n\n"),
+]
+
 support_list = [
     ("douban", re.compile("(https?://)?((movie|www)\.)?douban\.com/(subject|movie)/(?P<sid>\d+)/?")),
     ("imdb", re.compile("(https?://)?www\.imdb\.com/title/(?P<sid>tt\d+)")),
     # ("3dm", re.compile("(https?://)?bbs\.3dmgame\.com/thread-(?P<sid>\d+)(-1-1\.html)?")),
     ("steam", re.compile("(https?://)?(store\.)?steam(powered|community)\.com/app/(?P<sid>\d+)/?")),
     ("bangumi", re.compile("(https?://)?(bgm\.tv|bangumi\.tv|chii\.in)/subject/(?P<sid>\d+)/?")),
+    ('indienova', re.compile("(https?://)?indienova\.com/game/(?P<sid>\S+)")),
+    ("epic", re.compile("(https?://)?www\.epicgames\.com/store/[a-z]{2}-[A-Z]{2}/product/(?P<sid>\S+)/\S?"))
 ]
 
 support_site_list = list(map(lambda x: x[0], support_list))
@@ -577,5 +598,239 @@ class Gen(object):
                         _data = "\n".join(_data)
                     descr += ft.format(_data)
             data["format"] = descr
+
+            self.ret.update(data)
+    def _gen_indienova(self):
+        indienova_url = "https://indienova.com/game/{}".format(self.sid)
+        indienova_bs = get_page(indienova_url,bs_=True)
+        if indienova_bs.title.text.find("错误") > -1:
+            self.ret["error"] = "The corresponding resource does not exist."
+        else:
+            data = {}
+            # 提出封面
+            cover_field = indienova_bs.find("div", class_="cover-image")
+            cover = cover_field.img['src']
+            # 提出标题部分
+            require_field = indienova_bs.find("title").text
+            pre_title = require_field.split("|")[0]
+            chinese_title = pre_title.split(" - ")[0].strip()
+            # 提取出副标部分
+            title_field = indienova_bs.find("div", class_=re.compile("title-holder"))
+            another_title = title_field.h1.small.text if title_field.h1.small else "暂无数据"
+            english_title = title_field.h1.span.text if title_field.h1.span else chinese_title
+            # production_company = title_field.a.text
+            release_date = title_field.find("p",class_="gamedb-release").text
+            # 提取链接信息
+            link_field = indienova_bs.find("div",id="tabs-link").find_all("a", class_="gamedb-link")
+            if link_field:
+                links = []
+                for i in range(len(link_field)):
+                    links.append("[url={}]{}[/url]".format(link_field[i]['href'],link_field[i].span.text))
+            else:
+                links = ['暂无链接信息']
+            # 提取简介、类型信息
+            intro_field = indienova_bs.find(id="tabs-intro")
+            intro = intro_field.find("div", class_="bottommargin-sm").text.strip()
+            tt = intro_field.find_all_next("p", class_="single-line")
+
+            def h2b(line):
+                line = line.text.strip().replace('\n','').replace('\xa0', '').replace(' ','').replace(',',' / ')
+                return line
+
+            intro_detail = []
+            for i in range(len(tt)):
+                tab_detail = h2b(tt[i])
+                intro_detail.append(tab_detail)
+
+            intro_detail = "\n".join(intro_detail)
+            # 提取详细介绍 在游戏无详细介绍时用简介代替
+            descr_field = indienova_bs.find("article")
+            if descr_field:
+                pre_descr = descr_field.text.replace('……显示全部','')
+                descr = pre_descr.strip()
+            else:
+                descr = intro
+            # 提取评分信息
+            rating_field = indienova_bs.find("div", id="scores")
+            scores = rating_field.find_all("text")
+            rating = "{}:{} / {}:{}".format(scores[0].text,scores[1].text,scores[2].text,scores[3].text)
+
+            # 提取制作与发行商
+            pubdev_field = indienova_bs.find("div",id="tabs-devpub")
+            pubdev = pubdev_field.find_all("ul",class_=re.compile("db-companies\s\S+"))
+            dev = pubdev[0].text.strip().replace('\n',' / ')
+            if len(pubdev) == 2:
+                pub = pubdev[1].text.strip().replace('\n',' / ')
+            else:
+                pub = '暂无数据'
+            
+            # 提取图片列表
+            img_field = indienova_bs.find_all("li",class_="slide")
+            img_list=[] #暂存图片
+            i = 0
+            order = len(img_field)
+            if order > 4:
+                order = 4
+            for i in range(order):
+                img_list.append(img_field[i].img['src'])
+            # for tag in img_tag_list:
+            #     image_list.append(tag['src'])
+            screenshot=img_list
+            # 提取标签信息
+            cat_field = indienova_bs.find("div", class_="indienova-tags gamedb-tags")
+            if cat_field:
+                cat = " | ".join(cat_field.text.strip().split('\n')[:8])
+            else:
+                cat = "无标签"
+            # 提取分级信息
+            level_field = indienova_bs.find_all("div", class_="bottommargin-sm")[-1].find_all('img')
+            level_list = []
+            i = 0
+            for i in range(len(level_field)):
+                level_list.append("[img]"+level_field[i]['src']+"[/img] ")
+                #level_list.append(level_field[i]['src'])
+            # 提取价格信息
+            price_field = indienova_bs.find("ul",class_="db-stores")
+            if price_field:
+                price_list = []
+                price = price_field.find_all("li")
+                for i in range(len(price)):
+                    #price_list.append(price[i].text.strip().replace(' ','').replace('\n',''))
+                    price_list.append("{}：{}".format(price[i].span.text.strip(),price[i].find(text=re.compile("\d+")).strip()))
+            else:
+                price_list = ""
+            
+            base_info = "中文名称：{}\n".format(chinese_title)
+            base_info += "英文名称：{}\n".format(english_title)
+            base_info += "其他名称：{}\n".format(another_title)
+            base_info += "发行时间：{}\n".format(release_date)
+            base_info += "评分：{}\n".format(rating)
+            base_info += "开发商：{}\n".format(dev)
+            base_info += "发行商：{}\n".format(pub)
+            base_info += "{}\n".format(intro_detail)
+            base_info += "标签：{}\n".format(cat)
+            base_info += "链接地址：{}\n".format("  ".join(links))
+            base_info += "价格信息：{}\n".format(" / ".join(price_list)) if price_list else ""
+
+            data['baseinfo'] = base_info
+            data['cover'] = cover
+            data['descr'] = descr
+            data['screenshot'] = screenshot
+            data['level'] = level_list
+
+            #生成bbcode
+            descr=""
+            for key, ft in indienova_format:
+                _data=data.get(key)
+                if _data:
+                    if isinstance(_data,list):
+                        join_fix = ""
+                        if key == "screenshot":
+                            _data=map(lambda d: "[img]{}[/img]".format(d),_data)
+                        if key == "level":
+                            join_fix = "   "
+                        if key == "screenshot":
+                            join_fix = "\n"
+                        _data=join_fix.join(_data)
+                    descr+=ft.format(_data)
+            self.ret["format"] = descr
+
+            self.ret.update(data)
+
+    # By yezi1000
+    def _gen_epic(self):
+        session=requests.session()
+        epic_url="https://www.epicgames.com/store/zh-CN/product/{}/home".format(self.sid)
+        headers1={
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; rv:11.0) like Gecko"
+        }
+        epic_page=session.get(url=epic_url,headers=headers1,cookies={
+            "HAS_ACCEPTED_AGE_GATE_ONCE": "true" #成年认证
+        })
+
+        epic_bs=BeautifulSoup(epic_page.text,"lxml")
+        if epic_bs.title.text == '':
+            self.ret["error"] = "The corresponding resource does not exist."
+        else:
+            data={}
+            #data['name']=epic_bs.find(property="og:title")['content'] #游戏名称
+            name = epic_bs.find(property="og:title")['content']
+            name = name.split('-')[0]
+            data['name'] = name
+            data['desc']=epic_bs.find(property="og:description")['content'] #游戏简介
+            data["epic_link"]=epic_url #商店链接
+            data['logo']=epic_bs.find("img",class_=re.compile("DynamicLogo"))['src'] #游戏logo
+            img_tag_list=epic_bs.find_all("img",class_=re.compile("ImageGridItem")) #游戏截图
+
+
+            # 限制图片数量，降低服务器的存储压力
+            image_list=[] #暂存图片
+            i = 0
+            order = len(img_tag_list)
+            if order > 4:
+                order = 4
+            for i in range(order):
+                image_list.append(img_tag_list[i]['src'])
+            # for tag in img_tag_list:
+            #     image_list.append(tag['src'])
+            data['screenshot']=image_list
+
+            require_field=epic_bs.find("div",class_=re.compile("SystemRequirements")) #分离出简介部分
+            require_td=require_field.find_all("td")
+
+            min_req={} #最低配置
+            max_req={} #推荐配置
+
+            #最低和推荐配置循环出现
+            cnt = 0
+            for td in require_td:
+                if (len(td.contents)>=2):
+                    if (cnt%2==0):
+                        min_req[td.contents[0].text]=td.contents[1].text
+                    else:
+                        max_req[td.contents[0].text]=td.contents[1].text
+                    cnt+=1
+
+            #拼成字符串
+            min_req_str=""
+            max_req_str=""
+
+            for key in min_req:
+                min_req_str+=key+": "+min_req[key]+"\n"
+            for key in max_req:
+                max_req_str+=key+": "+max_req[key]+"\n"
+            data['min_req']=min_req_str
+            data['max_req']=max_req_str
+
+            #获取支持语言
+            languague=[]
+            lan_bs=require_field.find("ul",class_=re.compile("SystemRequirements-languageList"))
+            for li in lan_bs.contents:
+                languague.append(li.text)
+            rating=require_field.find("div",class_=re.compile("SystemRequirements-rating")).img['src']
+            data['language']="\n".join(languague)
+            data['level']=rating
+
+            #生成基础信息
+            base_info="游戏名称：{}\n".format(data['name']) if data.get('name') else ""
+            base_info+="商店链接：{}\n".format(data['epic_link']) if data.get('epic_link') else ""
+            #base_info+="游戏语种：{}\n".format("\n　   　　    ".join(data['language'])) if data.get('language') else ""
+            # base_info+="游戏评级：[img]{}[/img]\n".format(data['rating']) if data.get('rating') else ""
+            data['baseinfo']=base_info
+
+            #生成bbcode
+            descr=""
+            for key, ft in epic_format:
+                _data=data.get(key)
+                if _data:
+                    if isinstance(_data,list):
+                        join_fix = "\n"
+                        if key == "screenshot":
+                            _data=map(lambda d: "[img]{}[/img]".format(d),_data)
+                        if key =="min_req" or key =="max_req":
+                            join_fix="\n\n"
+                        _data=join_fix.join(_data)
+                    descr+=ft.format(_data)
+            self.ret["format"] = descr
 
             self.ret.update(data)

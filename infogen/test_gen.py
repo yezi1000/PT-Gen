@@ -40,6 +40,20 @@ if __name__ == '__main__':
         "https://store.steampowered.com/app/734730/Ancient_Frontier_Steel_Shadows/",  # Fix no review
     ]
 
+    indienova_link_list = [
+        "https://indienova.com/game/111",  # Indienova not exist
+        "https://indienova.com/game/abzu--1",  # Indienova Normal
+        "https://indienova.com/game/shop-titans",  # Indienova Without Details
+        "https://indienova.com/game/super-web-kittens-act-i",  # Indienova Without Tags
+        "https://indienova.com/game/summer-islands", # Indienova Without Age Rating
+        "https://indienova.com/game/hellblade-senuas-sacrifice", # Indienova With Many Price        
+    ]
+
+    epic_link_list = [
+        "https://indienova.com/game/111",  # Epic not exist
+        "https://www.epicgames.com/store/zh-CN/product/outerwilds/home",  # Epic Normal      
+    ]
+    
     other_link_list = [
         "http://jdaklvhgfad.com/adfad",  # No support link
     ]
