@@ -318,7 +318,7 @@ class Gen(object):
                     if isinstance(_data, list):
                         join_fix = " / "
                         if key == "cast":
-                            join_fix = "\n　　　　　　"
+                            join_fix = "\n　　　　　  "
                         elif key == "tags":
                             join_fix = " | "
                         _data = join_fix.join(_data)
