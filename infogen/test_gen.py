@@ -45,15 +45,15 @@ if __name__ == '__main__':
         "https://indienova.com/game/abzu--1",  # Indienova Normal
         "https://indienova.com/game/shop-titans",  # Indienova Without Details
         "https://indienova.com/game/super-web-kittens-act-i",  # Indienova Without Tags
-        "https://indienova.com/game/summer-islands", # Indienova Without Age Rating
-        "https://indienova.com/game/hellblade-senuas-sacrifice", # Indienova With Many Price        
+        "https://indienova.com/game/summer-islands",  # Indienova Without Age Rating
+        "https://indienova.com/game/hellblade-senuas-sacrifice",  # Indienova With Many Price
     ]
 
     epic_link_list = [
-        "https://indienova.com/game/111",  # Epic not exist
-        "https://www.epicgames.com/store/zh-CN/product/outerwilds/home",  # Epic Normal      
+        "https://www.epicgames.com/store/zh-CN/product/oute",  # Epic not exist
+        "https://www.epicgames.com/store/zh-CN/product/outerwilds/home",  # Epic Normal
     ]
-    
+
     other_link_list = [
         "http://jdaklvhgfad.com/adfad",  # No support link
     ]
@@ -75,8 +75,10 @@ if __name__ == '__main__':
     # test_link_list.extend(imdb_link_list)
     # test_link_list.extend(bgm_link_list)
     # test_link_list.extend(steam_link_list)
-    # test_link_list.extend(dict_link_list)
+    # test_link_list.extend(indienova_link_list)
+    # test_link_list.extend(epic_link_list)
     # test_link_list.extend(other_link_list)
+    # test_link_list.extend(dict_link_list)
 
     for link in test_link_list:
         print("Test link: {}".format(link))
@@ -84,7 +86,8 @@ if __name__ == '__main__':
         if gen["success"]:
             print("Format text:\n", gen["format"])
             import json
-            print(json.dumps(gen,ensure_ascii=False,sort_keys=True))
+
+            print(json.dumps(gen, ensure_ascii=False, sort_keys=True))
         else:
             print("Error : {}".format(gen["error"]))
         print("--------------------")
