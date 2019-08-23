@@ -9,7 +9,7 @@ import requests
 from bs4 import BeautifulSoup
 from html2bbcode.parser import HTML2BBCode
 
-__version__ = "0.4.8"
+__version__ = "0.4.9"
 __author__ = "Rhilip"
 
 support_list = [
@@ -239,7 +239,7 @@ class Gen(object):
 
         # -*- 组合数据 -*-
         descr = ""
-        descr += "[img]{}[img]\n\n".format(data['poster']) if data['poster'] else ""
+        descr += "[img]{}[/img]\n\n".format(data['poster']) if data['poster'] else ""
         descr += "◎译　　名　{}\n".format(" / ".join(data['trans_title'])) if data['trans_title'] else ""
         descr += "◎片　　名　{}\n".format(" / ".join(data['this_title'])) if data['this_title'] else ""
         descr += "◎年　　代　{}\n".format(data['year']) if data.get('year') else ""
@@ -608,7 +608,7 @@ class Gen(object):
 
         # 生成bbcode
         descr = ""
-        descr += "[img]{}[img]\n\n".format(data['cover']) if data.get('cover') else ""
+        descr += "[img]{}[/img]\n\n".format(data['cover']) if data.get('cover') else ""
         descr += "【基本信息】\n\n"
         descr += "中文名称：{}\n".format(data['chinese_title']) if data.get('chinese_title') else ""
         descr += "英文名称：{}\n".format(data['english_title']) if data.get('english_title') else ""
