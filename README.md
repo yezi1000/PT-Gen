@@ -10,3 +10,4 @@ https://www.bfdz.ink/tools/ptgen
 
 - [接口说明](https://github.com/BFDZ/PT-Gen/wiki/%E6%8E%A5%E5%8F%A3%E8%AF%B4%E6%98%8E)
 - [部署说明](https://github.com/BFDZ/PT-Gen/wiki/%E9%83%A8%E7%BD%B2%E8%AF%B4%E6%98%8E)
+- [Docker部署说明](https://github.com/BFDZ/PT-Gen-docker)
