@@ -9,7 +9,7 @@ import requests
 from bs4 import BeautifulSoup
 from html2bbcode.parser import HTML2BBCode
 
-__version__ = "0.4.9"
+__version__ = "0.5.1"
 __author__ = "Rhilip"
 
 support_list = [

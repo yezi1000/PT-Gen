@@ -45,8 +45,8 @@ def get_key(key):
 
 
 @app.route('/')
-def hello():
-    return "Hello world~"
+def home():
+    return app.send_static_file('ptgen.html')
 
 
 @app.route('/infogen')
