@@ -218,7 +218,7 @@ $(function () {
                 }
             }
 
-            $.getJSON("http://127.0.0.1:5000/infogen", param).success(function (data) {
+            $.getJSON("/infogen", param).success(function (data) {
                 out_textarea.val(data["success"] === false ? data["error"] : data["format"]);
             }).fail(function (jqXHR) {
                 alert(jqXHR.status === 429 ? 'Met Rate Limit, Retry later~' : "Error occured!");
