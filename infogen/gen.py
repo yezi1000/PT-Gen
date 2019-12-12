@@ -412,7 +412,7 @@ class Gen(object):
 
         # 请求第三方中文名信息
         try:  # Thanks @Deparsoul with his Database
-            steamcn_json = get_page("https://steamdb.steamcn.com/app/{}/data.js?v=38".format(self.sid), jsonp_=True)
+            steamcn_json = get_page("https://steamdb.keylol.com/app/{}/data.js?v=38".format(self.sid), jsonp_=True)
         except Exception:
             pass
         else:
