@@ -6,7 +6,7 @@ COPY ../ /app
 
 COPY ./crontab /etc/crontabs/
 
-COPY ../prestart.sh /app
+COPY ./prestart.sh /app
 
 RUN apk add python3-dev libxml2-dev libxslt-dev zlib-dev gcc libc-dev
 
