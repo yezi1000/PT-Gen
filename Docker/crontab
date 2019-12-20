@@ -1,1 +1,1 @@
-*/30 * * * * cd /app && /usr/local/bin/flask update_infogen
+*/10 * * * * cd /app && /usr/local/bin/flask update_infogen

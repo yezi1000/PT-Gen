@@ -92,7 +92,7 @@ def infogen():
 @app.cli.command('update_infogen')
 def update_infogen():
     to_updates = db_exec("SELECT `site`,`sid` FROM `info_gen` "
-                         "WHERE STRFTIME('%s',update_at) < STRFTIME('%s','now','-2 months')"  # 2个月以上算过期失效
+                         "WHERE STRFTIME('%s',update_at) < STRFTIME('%s','now','-15 days')"  # 15天以上算过期失效
                          " ORDER BY RANDOM() LIMIT 5")  # 每次随机读5个
     for url in to_updates:
         site = url['site']
