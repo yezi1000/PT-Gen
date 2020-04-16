@@ -18,7 +18,7 @@ support_list = [
     ("steam", re.compile("(https?://)?(store\.)?steam(powered|community)\.com/app/(?P<sid>\d+)/?")),
     ("bangumi", re.compile("(https?://)?(bgm\.tv|bangumi\.tv|chii\.in)/subject/(?P<sid>\d+)/?")),
     ('indienova', re.compile("(https?://)?indienova\.com/game/(?P<sid>\S+)")),
-    ("epic", re.compile("(https?://)?www\.epicgames\.com/store/[a-z]{2}-[A-Z]{2}/product/(?P<sid>\S+)/\S?"))
+    ("epic", re.compile("(https?://)?www\.epicgames\.com/store/[a-zA-Z-]+/product/(?P<sid>\S+)/\S?"))
 ]
 
 support_site_list = list(map(lambda x: x[0], support_list))
@@ -631,7 +631,7 @@ class Gen(object):
     # By yezi1000
     def _gen_epic(self):
         data = {}
-        epic_api_url = "https://www.epicgames.com/store/zh-CN/api/content/products/{}".format(self.sid)
+        epic_api_url = "https://store-content.ak.epicgames.com/api/zh-CN/content/products/{}".format(self.sid)
 
         try:
             epic_api_json = get_page(epic_api_url, json_=True)
