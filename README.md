@@ -4,7 +4,7 @@ PT-Gen 可根据豆瓣、IMDb、Bangumi、Steam 链接自动生成简介。
 
 ## 停止维护
 
-2020年8月19日，豆瓣的api_key全部失效，此项目软件已无法正常使用，无限期停止维护。
+2020年8月19日，豆瓣的api_key全部失效，此项目 python 版已无法正常使用，无限期停止维护。
 
 请换用 Rhilip 大佬开发的 cfworker 版本：https://github.com/Rhilip/pt-gen-cfworker
 
