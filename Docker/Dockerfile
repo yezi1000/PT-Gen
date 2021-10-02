@@ -1,7 +1,5 @@
 FROM tiangolo/meinheld-gunicorn-flask:python3.7-alpine3.8
 
-LABEL maintainer "BFDZ <root@bfdz.ink>"
-
 COPY ./ /app
 
 COPY ./Docker/crontab /etc/crontabs/
